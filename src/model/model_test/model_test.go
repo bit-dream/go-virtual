@@ -23,6 +23,13 @@ func TestBadFileExtension(t *testing.T) {
 	}
 }
 
+func TestGetMessages(t *testing.T) {
+	messages := model.GetMessages(*GlobalTestVm)
+	if messages == nil {
+		t.Error("Model returned no messages")
+	}
+}
+
 func TestGroupMessagesByChannel(t *testing.T) {
 	mapping := model.GetMessagesByChannels(*GlobalTestVm)
 	if mapping == nil {
