@@ -19,10 +19,10 @@ func MessageDefToMessage(def *dbc.MessageDef) descriptor.Message {
 			Name:             string(signalDef.Name),
 			Start:            uint8(signalDef.StartBit),
 			Length:           uint8(signalDef.Size),
-			IsBigEndian:      bool(signalDef.IsBigEndian),
-			IsSigned:         bool(signalDef.IsSigned),
-			IsMultiplexer:    bool(signalDef.IsMultiplexerSwitch),
-			IsMultiplexed:    bool(signalDef.IsMultiplexed),
+			IsBigEndian:      signalDef.IsBigEndian,
+			IsSigned:         signalDef.IsSigned,
+			IsMultiplexer:    signalDef.IsMultiplexerSwitch,
+			IsMultiplexed:    signalDef.IsMultiplexed,
 			MultiplexerValue: uint(signalDef.MultiplexerSwitch),
 			Offset:           signalDef.Offset,
 			Scale:            signalDef.Factor,
@@ -30,7 +30,7 @@ func MessageDefToMessage(def *dbc.MessageDef) descriptor.Message {
 			Max:              signalDef.Maximum,
 			Unit:             string(signalDef.Unit),
 			Description:      string(""),
-			// Implement the rest of the signal properties
+			// TODO: Implement the rest of the signal properties
 		}
 		signals = append(signals, &signal)
 	}

@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/bit-dream/go-virtual/src/candatabase"
+	"github.com/bit-dream/go-virtual/pkg/candatabase"
+	"go.einride.tech/can"
 )
 
 func main() {
@@ -12,5 +13,14 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(data)
+	fmt.Println(len(data.Messages))
+
+	frame := can.Frame{
+		ID:         1160,
+		Length:     4,
+		Data:       can.Data{0xFF, 0x10, 0x10, 0x10},
+		IsRemote:   false,
+		IsExtended: false,
+	}
+	candatabase.DecodeFrame(frame, data.Messages[0])
 }

@@ -1,7 +1,7 @@
 package model_test
 
 import (
-	"github.com/bit-dream/go-virtual/src/model"
+	"github.com/bit-dream/go-virtual/pkg/model"
 	"testing"
 )
 
