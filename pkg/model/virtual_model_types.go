@@ -1,5 +1,9 @@
 package model
 
+import (
+	"go.einride.tech/can/pkg/descriptor"
+)
+
 type VirtualModel struct {
 	Messages []VirtualMessage `json:"messages"`
 	Channels []Channel        `json:"channels"`
@@ -26,13 +30,16 @@ type VirtualMessage struct {
 	DefaultValueForSignals *int                `json:"defaultValueForSignals,omitempty"`
 	Signals                *[]VirtualSignal    `json:"signals,omitempty"`
 	TransmissionOptions    TransmissionOptions `json:"transmissionOptions"`
+	MessageDefinition      *descriptor.Message `json:"messageDefinition,omitempty"`
 }
 
 type VirtualSignal struct {
 	Name                string               `json:"name"`
 	DefaultValue        int                  `json:"defaultValue"`
 	ValueQueue          *[]int               `json:"valueQueue,omitempty"`
+	LastValueHold       *bool                `json:"lastValueHold,omitempty"`
 	TransmissionOptions *TransmissionOptions `json:"transmissionOptions,omitempty"`
+	SignalDefinition    *descriptor.Signal   `json:"signalDefinition,omitempty"`
 }
 
 type TransmissionOptions struct {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/bit-dream/go-virtual/pkg/candatabase"
 	"os"
 	"strings"
 )
@@ -40,7 +41,7 @@ func GetSignalsFromMessage(vm VirtualModel, messageName string) []VirtualSignal 
 	return nil
 }
 
-func GetMessagesByChannels(vm VirtualModel) ChannelMap {
+func MarshalModelToChannelMap(vm VirtualModel) ChannelMap {
 	chMap := make(map[string][]VirtualMessage)
 
 	messages := GetMessages(vm)
@@ -58,4 +59,21 @@ func GetMessagesByChannels(vm VirtualModel) ChannelMap {
 	}
 
 	return chMap
+}
+
+func UpdateVirtualModelByDefinitions(vm *VirtualModel) error {
+
+	for i, _ := range vm.Messages {
+		message := &vm.Messages[i]
+		data, err := candatabase.LoadDbc(message.Dbc)
+		if err != nil {
+			return fmt.Errorf("error while unloading DBC file: %d", err)
+		}
+		if _, ok := data.Messages[message.Name]; !ok {
+			return fmt.Errorf("provided message name %s does not exists in provided dbc file", message.Name)
+		}
+		messageDef := data.Messages[message.Name]
+		message.MessageDefinition = &messageDef
+	}
+	return nil
 }

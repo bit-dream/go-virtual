@@ -1,0 +1,59 @@
+{
+  "channels": [
+    {
+      "interface": "socketcan",
+      "channelName": "vcan0",
+      "baudRate": 250000
+    },
+    {
+      "interface": "socketcan",
+      "channelName": "vcan1",
+      "baudRate": 500000,
+      "channelOptions": {
+          "packetSpacing": 50
+      }
+    }
+  ],
+  "messages": [
+    {
+      "name": "DAS_steeringControl",
+      "dbc": "/Users/headquarters/Documents/Code/go-virtual/src/tesla_can.dbc",
+      "channel": "vcan0",
+      "defaultValueForSignals": 0,
+      "transmissionOptions": {
+        "transmitRate": 100
+      },
+      "signals": [
+        {
+          "name": "EngineRPM",
+          "defaultValue": 400
+        },
+        {
+          "name": "ThrottleSignal",
+          "defaultValue": 0,
+          "valueQueue": [0, 0, 0, 10, 20, 30, 40, 50, 0]
+        }
+      ]
+    },
+    {
+      "name": "DAS_control",
+      "dbc": "/Users/headquarters/Documents/Code/go-virtual/src/tesla_can.dbc",
+      "channel": "vcan1",
+      "defaultValueForSignals": 0,
+      "transmissionOptions": {
+        "transmitRate": 100
+      },
+      "signals": [
+        {
+          "name": "EngineRPM",
+          "defaultValue": 400
+        },
+        {
+          "name": "ThrottleSignal",
+          "defaultValue": 0,
+          "valueQueue": [0, 0, 0, 10, 20, 30, 40, 50, 0]
+        }
+      ]
+    }
+  ]
+}

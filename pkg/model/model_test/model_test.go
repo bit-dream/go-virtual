@@ -31,7 +31,7 @@ func TestGetMessages(t *testing.T) {
 }
 
 func TestGroupMessagesByChannel(t *testing.T) {
-	mapping := model.GetMessagesByChannels(*GlobalTestVm)
+	mapping := model.MarshalModelToChannelMap(*GlobalTestVm)
 	if mapping == nil {
 		t.Error("Model returned nil channels")
 	}

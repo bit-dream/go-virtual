@@ -1,26 +1,23 @@
 package main
 
-import (
-	"fmt"
-	"github.com/bit-dream/go-virtual/pkg/candatabase"
-	"go.einride.tech/can"
-)
+import "fmt"
 
 func main() {
-	const inputFile = "/Users/headquarters/Documents/Code/go-virtual/src/tesla_can.dbc"
-	data, err := candatabase.LoadDbc(inputFile)
-	if err != nil {
-		fmt.Println(err)
-	}
+	fmt.Println("Hello, world!")
+	/*
+		const networkFile = "/Users/headquarters/Documents/Code/go-virtual/src/tesla.network"
 
-	fmt.Println(len(data.Messages))
+		virtualModel, err := model.LoadModel(networkFile)
+		if err != nil {
+			fmt.Println(err)
+		}
 
-	frame := can.Frame{
-		ID:         1160,
-		Length:     4,
-		Data:       can.Data{0xFF, 0x10, 0x10, 0x10},
-		IsRemote:   false,
-		IsExtended: false,
-	}
-	candatabase.DecodeFrame(frame, data.Messages[0])
+		err = model.UpdateVirtualModelByDefinitions(virtualModel)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		var a = 2
+		fmt.Println(a)
+	*/
 }
