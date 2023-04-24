@@ -1,19 +1,19 @@
 package candatabase_test
 
 import (
-	"github.com/bit-dream/go-virtual/pkg/candatabase"
+	"github.com/bit-dream/go-virtual/pkg/can_database"
 	"testing"
 )
 
 func TestLoadDbcFile(t *testing.T) {
-	_, err := candatabase.LoadDbc("tesla_can.dbc")
+	_, err := can_database.LoadDbc("tesla_can.dbc")
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestLoadingOfMessages(t *testing.T) {
-	data, err := candatabase.LoadDbc("tesla_can.dbc")
+	data, err := can_database.LoadDbc("tesla_can.dbc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -26,11 +26,11 @@ func TestLoadingOfMessages(t *testing.T) {
 }
 
 func TestGetMessageById(t *testing.T) {
-	data, err := candatabase.LoadDbc("tesla_can.dbc")
+	data, err := can_database.LoadDbc("tesla_can.dbc")
 	if err != nil {
 		t.Error(err)
 	}
-	message := candatabase.GetMessageById(data, 1160)
+	message := can_database.GetMessageById(data, 1160)
 	if message == nil {
 		t.Error("Returned message from GetMessageById was nil, should be DAS_steeringControl")
 	}
@@ -39,7 +39,7 @@ func TestGetMessageById(t *testing.T) {
 	}
 
 	// Try non-existant message
-	badMessage := candatabase.GetMessageById(data, 1)
+	badMessage := can_database.GetMessageById(data, 1)
 	if badMessage != nil {
 		t.Error("GetMessageById returned a message when it should returned nil")
 	}

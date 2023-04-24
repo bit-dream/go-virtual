@@ -27,16 +27,19 @@ type VirtualMessage struct {
 	Name                   string              `json:"name"`
 	Dbc                    string              `json:"dbc"`
 	Channel                string              `json:"channel"`
+	TransmissionOptions    TransmissionOptions `json:"transmissionOptions"`
 	DefaultValueForSignals *int                `json:"defaultValueForSignals,omitempty"`
 	Signals                *[]VirtualSignal    `json:"signals,omitempty"`
-	TransmissionOptions    TransmissionOptions `json:"transmissionOptions"`
 	MessageDefinition      *descriptor.Message `json:"messageDefinition,omitempty"`
 }
 
 type VirtualSignal struct {
 	Name                string               `json:"name"`
 	DefaultValue        int                  `json:"defaultValue"`
+	Value               *int                 `json:"value,omitempty"`
 	ValueQueue          *[]int               `json:"valueQueue,omitempty"`
+	LoopQueue           *bool                `json:"loopQueue,omitempty"`
+	ImportQueueFile     *string              `json:"importQueue,omitempty"`
 	LastValueHold       *bool                `json:"lastValueHold,omitempty"`
 	TransmissionOptions *TransmissionOptions `json:"transmissionOptions,omitempty"`
 	SignalDefinition    *descriptor.Signal   `json:"signalDefinition,omitempty"`

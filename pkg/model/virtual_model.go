@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/bit-dream/go-virtual/pkg/candatabase"
+	"github.com/bit-dream/go-virtual/pkg/can_database"
 	"os"
 	"strings"
 )
@@ -65,7 +65,7 @@ func UpdateVirtualModelByDefinitions(vm *VirtualModel) error {
 
 	for i, _ := range vm.Messages {
 		message := &vm.Messages[i]
-		data, err := candatabase.LoadDbc(message.Dbc)
+		data, err := can_database.LoadDbc(message.Dbc)
 		if err != nil {
 			return fmt.Errorf("error while unloading DBC file: %d", err)
 		}

@@ -1,4 +1,4 @@
-package candatabase
+package can_database
 
 import "go.einride.tech/can/pkg/descriptor"
 
