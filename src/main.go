@@ -2,35 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/bit-dream/go-virtual/pkg/virtualizer"
-	"time"
+	"github.com/bit-dream/go-virtual/pkg/can_database"
 )
 
 func main() {
 	fmt.Println("Hello, world!")
 
-	stop := make(chan bool)
+	ecu1, err := can_database.LoadEcu("/Users/headquarters/Documents/Code/go-virtual/pkg/ecu_model/ecu_model_test/test1.ecu")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(ecu1)
 
-	go virtualizer.PeriodicTimer(2000, stop, func() {
-		fmt.Println("This is a timer!")
-	})
-
-	time.Sleep(10 * time.Second)
-	stop <- true
-	/*
-		const networkFile = "/Users/headquarters/Documents/Code/go-virtual/src/tesla.network"
-
-		virtualModel, err := model.LoadModel(networkFile)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		err = model.UpdateVirtualModelByDefinitions(virtualModel)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		var a = 2
-		fmt.Println(a)
-	*/
 }

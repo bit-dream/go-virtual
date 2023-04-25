@@ -1,17 +1,19 @@
 package can_database
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/bit-dream/go-virtual/pkg/ecu_model"
 	"go.einride.tech/can/pkg/dbc"
 	"go.einride.tech/can/pkg/descriptor"
 	"os"
+	"strings"
 )
-
-type MessageMap map[string]descriptor.Message
 
 type DbcData struct {
 	Path     string
-	Messages MessageMap
+	Messages ecu_model.MessageMap
 }
 
 func MessageDefToMessage(def *dbc.MessageDef) descriptor.Message {
@@ -59,28 +61,65 @@ func UnmarshalMessagesFromDef(definitions []dbc.Def) []descriptor.Message {
 
 }
 
-func MarshalMessagesToMap(messages []descriptor.Message) MessageMap {
-	messageMap := make(MessageMap, 0)
+func MarshalMessagesToMap(messages []descriptor.Message) ecu_model.MessageMap {
+	messageMap := make(ecu_model.MessageMap, 0)
 	for _, message := range messages {
 		messageMap[message.Name] = message
 	}
 	return messageMap
 }
 
-func LoadDbc(file string) (DbcData, error) {
-	dbcData := DbcData{Path: file}
+func LoadDbc(file string, dbcData *ecu_model.MessageMap) error {
+
 	data, err := os.ReadFile(file)
 	if err != nil {
-		return dbcData, fmt.Errorf("error while reading the file: %d", err)
+		return fmt.Errorf("error while reading the file: %d", err)
 	}
 
 	parser := dbc.NewParser(file, data)
 	err = parser.Parse()
 	if err != nil {
-		return dbcData, fmt.Errorf("error while parsing the database: %d", err)
+		return fmt.Errorf("error while parsing the database: %d", err)
 	}
 
 	messages := UnmarshalMessagesFromDef(parser.Defs())
-	dbcData.Messages = MarshalMessagesToMap(messages)
-	return dbcData, nil
+	for _, message := range messages {
+		_, ok := (*dbcData)[message.Name]
+		if ok {
+			return errors.New("duplicate message names detected, only unique message names across all dbc files permitted")
+		}
+		(*dbcData)[message.Name] = message
+	}
+	return nil
+}
+
+// LoadEcu Loads an individual .ecu file and modifies the existing model
+func LoadEcu(file string) (*ecu_model.VirtualEcu, error) {
+	if !strings.HasSuffix(file, ".ecu") {
+		return nil, errors.New("file must have .ecu suffix")
+	}
+
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return nil, fmt.Errorf("error occurred while reading from file: %d", err)
+	}
+
+	ecu := ecu_model.VirtualEcu{}
+	err = json.Unmarshal(data, &ecu)
+	if err != nil {
+		return nil, fmt.Errorf("error occurred while unmarshing file to ecu model: %d", err)
+	}
+
+	// Load dbc data
+	dbcData := ecu_model.MessageMap{}
+	for _, file := range ecu.Files {
+		err := LoadDbc(file, &dbcData)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing dbc file: %d", err)
+		}
+	}
+
+	ecu.DbcData = &dbcData
+
+	return &ecu, nil
 }
