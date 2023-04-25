@@ -1,0 +1,38 @@
+{
+    "name": "transmission",
+    "ecuChannel": {
+        "interface": "socketcan",
+        "channel": "vcan0",
+        "baudRate": 250000
+    },
+    "files": [
+        "tesla_can.dbc",
+        "J1939.dbc"
+    ],
+    "messages": [
+        {
+            "name": "AccelerationSensor",
+            "transmissionOptions": {
+                "transmitRate": 100
+            },
+            "defaultValueForSignals": 0,
+            "signals": [
+                {
+                    "name": "SpprtVrblTrnsRpttnRtFrAcclrtnSns",
+                    "defaultValue": 10
+                },
+                {
+                    "name": "VrtclAcclrtnExRngeFigureOfMerit",
+                    "defaultValue": 2
+                }
+            ]
+        },
+        {
+            "name": "DAS_control",
+            "transmissionOptions": {
+                "transmitRate": 200
+            },
+            "defaultValueForSignals": 0
+        }
+    ]
+}

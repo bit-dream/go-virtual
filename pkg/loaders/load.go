@@ -1,4 +1,4 @@
-package can_database
+package loaders
 
 import (
 	"encoding/json"
@@ -8,6 +8,7 @@ import (
 	"go.einride.tech/can/pkg/dbc"
 	"go.einride.tech/can/pkg/descriptor"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -122,4 +123,23 @@ func LoadEcu(file string) (*ecu_model.VirtualEcu, error) {
 	ecu.DbcData = &dbcData
 
 	return &ecu, nil
+}
+
+func FindAndLoadEcus() []ecu_model.VirtualEcu {
+	files, err := filepath.Glob("*.ecu")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	vecus := make([]ecu_model.VirtualEcu, 0)
+	// search for ecu files
+	for _, file := range files {
+		ecu, err := LoadEcu(file)
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		vecus = append(vecus, *ecu)
+	}
+	return vecus
 }

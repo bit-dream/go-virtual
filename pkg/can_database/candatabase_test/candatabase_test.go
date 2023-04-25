@@ -2,18 +2,19 @@ package candatabase_test
 
 import (
 	"github.com/bit-dream/go-virtual/pkg/can_database"
+	"github.com/bit-dream/go-virtual/pkg/loaders"
 	"testing"
 )
 
 func TestLoadDbcFile(t *testing.T) {
-	_, err := can_database.LoadDbc("tesla_can.dbc")
+	_, err := loaders.LoadDbc("tesla_can.dbc")
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestLoadingOfMessages(t *testing.T) {
-	data, err := can_database.LoadDbc("tesla_can.dbc")
+	data, err := loaders.LoadDbc("tesla_can.dbc")
 	if err != nil {
 		t.Error(err)
 	}
@@ -26,7 +27,7 @@ func TestLoadingOfMessages(t *testing.T) {
 }
 
 func TestGetMessageById(t *testing.T) {
-	data, err := can_database.LoadDbc("tesla_can.dbc")
+	data, err := loaders.LoadDbc("tesla_can.dbc")
 	if err != nil {
 		t.Error(err)
 	}
