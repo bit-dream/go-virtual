@@ -2,14 +2,13 @@ package can_database
 
 import (
 	"github.com/bit-dream/go-virtual/pkg/ecu_model"
-	"github.com/bit-dream/go-virtual/pkg/loaders"
 	"go.einride.tech/can"
 	"go.einride.tech/can/pkg/descriptor"
 )
 
-func GetMessageById(dbc loaders.DbcData, id uint32) *descriptor.Message {
+func GetMessageById(dbc ecu_model.MessageMap, id uint32) *descriptor.Message {
 
-	for _, value := range dbc.Messages {
+	for _, value := range dbc {
 		if value.ID == id {
 			return &value
 		}

@@ -67,7 +67,6 @@ func TestCreatePayload(t *testing.T) {
 	}
 }
 
-/*
 func TestGetMessageById(t *testing.T) {
 	data := ecu_model.MessageMap{}
 	err := loaders.LoadDbc("tesla_can.dbc", &data)
@@ -88,4 +87,3 @@ func TestGetMessageById(t *testing.T) {
 		t.Error("GetMessageById returned a message when it should returned nil")
 	}
 }
-*/
