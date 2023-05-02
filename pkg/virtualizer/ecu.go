@@ -7,11 +7,15 @@ import (
 	"go.einride.tech/can/pkg/descriptor"
 )
 
+// VirtualizeEcu Virtualizes the provided ecu model. Each message within the virtual ecu will run as a separate go
+// routine
 func VirtualizeEcu(ecu ecu_model.VirtualEcu, stop chan bool) error {
 
-	//transmitter := socketcan.NewTransmitter(conn)
+	if ecu.Messages == nil {
+		return fmt.Errorf("provided ecu contained messages that were nil")
+	}
+
 	for _, message := range *ecu.Messages {
-		rate := message.TransmissionOptions.TransmitRate
 
 		dbcData := *ecu.DbcData
 		dbcMessage, ok := dbcData[message.Name]
@@ -19,23 +23,18 @@ func VirtualizeEcu(ecu ecu_model.VirtualEcu, stop chan bool) error {
 			return fmt.Errorf("could not find message %s in DBC data", message.Name)
 		}
 
-		signals := ConvertDbcMessageToVirtualSignals(dbcMessage, message)
-		/*
-			if message.Signals != nil {
-				OverrideVirtualSignals(signals, *message.Signals)
-			}
-		*/
-		signalList := getAllValues(signals)
+		signals := MarshalMessageToVirtualSignals(dbcMessage, message)
+		if message.Signals != nil {
+			signals = OverrideVirtualSignals(signals, *message.Signals)
+		}
+		signalList := getSignalMapValues(signals)
 		if signals == nil || len(signals) == 0 {
 			return fmt.Errorf("an error occured while generating signal list to be sent by the virtual ecu")
 		}
 
+		rate := message.TransmissionOptions.TransmitRate
 		if rate != nil {
 			go PeriodicTimer(*rate, stop, func() {
-				if signals == nil {
-					fmt.Println("Error encountered were signals were nil: ", message)
-					return
-				}
 				payload := can_database.GeneratePayloadFromSignals(signalList)
 				fmt.Println(payload)
 			})
@@ -47,7 +46,9 @@ func VirtualizeEcu(ecu ecu_model.VirtualEcu, stop chan bool) error {
 	return nil
 }
 
-func getAllValues(m map[string]ecu_model.VirtualSignal) []ecu_model.VirtualSignal {
+type SignalMap map[string]ecu_model.VirtualSignal
+
+func getSignalMapValues(m SignalMap) []ecu_model.VirtualSignal {
 	values := make([]ecu_model.VirtualSignal, 0, len(m))
 	for _, v := range m {
 		values = append(values, v)
@@ -55,7 +56,7 @@ func getAllValues(m map[string]ecu_model.VirtualSignal) []ecu_model.VirtualSigna
 	return values
 }
 
-func ConvertDbcMessageToVirtualSignals(message descriptor.Message, virtualMessage ecu_model.VirtualMessage) map[string]ecu_model.VirtualSignal {
+func MarshalMessageToVirtualSignals(message descriptor.Message, virtualMessage ecu_model.VirtualMessage) SignalMap {
 
 	var defaultValue int = 0
 	if virtualMessage.DefaultValueForSignals != nil {
@@ -79,58 +80,13 @@ func ConvertDbcMessageToVirtualSignals(message descriptor.Message, virtualMessag
 	return virtualSignals
 }
 
-func OverrideVirtualSignals(signals map[string]ecu_model.VirtualSignal, overrideSignals []ecu_model.VirtualSignal) {
+func OverrideVirtualSignals(signals SignalMap, overrideSignals []ecu_model.VirtualSignal) SignalMap {
 	for _, overrideSignal := range overrideSignals {
-		_, hasSignal := signals[overrideSignal.Name]
+		virtualSignal, hasSignal := signals[overrideSignal.Name]
 		if hasSignal {
+			overrideSignal.SignalDefinition = virtualSignal.SignalDefinition
 			signals[overrideSignal.Name] = overrideSignal
 		}
 	}
-}
-
-// GenerateCompleteSignalList will consolidate signals that are in the dbc file and signals defined by the Virtual ECU
-// so there are no duplicates
-func GenerateCompleteSignalList(dbcMessage descriptor.Message, virtualMessage ecu_model.VirtualMessage) []ecu_model.VirtualSignal {
-
-	dbcSignals := dbcMessage.Signals
-	updatedSignalList := make([]ecu_model.VirtualSignal, 0)
-
-	virtualSignals := make([]ecu_model.VirtualSignal, 0)
-	if virtualMessage.Signals != nil {
-		virtualSignals = *virtualMessage.Signals
-		for idx, _ := range virtualSignals {
-			updatedSignalList = append(updatedSignalList, virtualSignals[idx])
-		}
-	} else {
-
-	}
-
-	for _, dbcSignal := range dbcSignals {
-		if !signalIsInList(dbcSignal.Name, virtualSignals) {
-			var defaultValue int = 0
-			if virtualMessage.DefaultValueForSignals != nil {
-				defaultValue = *virtualMessage.DefaultValueForSignals
-			}
-
-			newSignal := ecu_model.VirtualSignal{
-				Name:             dbcSignal.Name,
-				DefaultValue:     defaultValue,
-				SignalDefinition: dbcSignal,
-			}
-
-			updatedSignalList = append(updatedSignalList, newSignal)
-		}
-	}
-
-	return updatedSignalList
-}
-
-// signalIsInList returns true if the signal name is in the provided signal list
-func signalIsInList(signalName string, signalList []ecu_model.VirtualSignal) bool {
-	for _, signal := range signalList {
-		if signalName == signal.Name {
-			return true
-		}
-	}
-	return false
+	return signals
 }

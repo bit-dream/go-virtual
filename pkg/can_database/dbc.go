@@ -17,6 +17,9 @@ func GetMessageById(dbc ecu_model.MessageMap, id uint32) *descriptor.Message {
 }
 func GeneratePayloadFromSignals(signals []ecu_model.VirtualSignal) can.Data {
 	data := can.Data{}
+	if len(signals) == 0 {
+		return data
+	}
 	for _, signal := range signals {
 		var sigVal int64
 		var usigVal uint64
