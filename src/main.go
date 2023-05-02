@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/bit-dream/go-virtual/pkg/loaders"
 	"github.com/bit-dream/go-virtual/pkg/virtualizer"
 	"time"
@@ -8,16 +9,10 @@ import (
 
 func main() {
 
-	vecus := loaders.FindAndLoadEcus()
-
-	stop := make(chan bool)
-
-	for _, vecu := range vecus {
-		err := virtualizer.VirtualizeEcu(vecu, stop)
-		if err != nil {
-			stop <- true
-			return
-		}
+	ecus := loaders.FindAndLoadEcus()
+	stop, err := virtualizer.StartAllVirtualEcus(ecus)
+	if err != nil {
+		fmt.Println("Application terminated prematurely due to an error: ", err)
 	}
 
 	// Create a timer that will send a signal to the stop channel after 20 seconds.

@@ -6,6 +6,7 @@ import (
 	"go.einride.tech/can/pkg/descriptor"
 )
 
+// GetMessageById returns a message by CAN ID
 func GetMessageById(dbc ecu_model.MessageMap, id uint32) *descriptor.Message {
 
 	for _, value := range dbc {
@@ -15,7 +16,9 @@ func GetMessageById(dbc ecu_model.MessageMap, id uint32) *descriptor.Message {
 	}
 	return nil
 }
-func GeneratePayloadFromSignals(signals []ecu_model.VirtualSignal) can.Data {
+
+// MarshalSignalsToPayload provided a list of virtual signals will provide the subsequent CAN data payload
+func MarshalSignalsToPayload(signals []ecu_model.VirtualSignal) can.Data {
 	data := can.Data{}
 	if len(signals) == 0 {
 		return data
@@ -62,4 +65,43 @@ func GeneratePayloadFromSignals(signals []ecu_model.VirtualSignal) can.Data {
 	}
 
 	return data
+}
+
+// MarshalMessageToVirtualSignals concat a message and virtual message's signals into a signal mapping, with the signal
+// name being the keys to the map
+func MarshalMessageToVirtualSignals(message descriptor.Message, virtualMessage ecu_model.VirtualMessage) ecu_model.SignalMap {
+
+	var defaultValue int = 0
+	if virtualMessage.DefaultValueForSignals != nil {
+		defaultValue = *virtualMessage.DefaultValueForSignals
+	}
+
+	virtualSignals := make(map[string]ecu_model.VirtualSignal)
+	for _, signal := range message.Signals {
+		_, keyAlreadyExists := virtualSignals[signal.Name]
+		if keyAlreadyExists {
+			continue
+		}
+		newSignal := ecu_model.VirtualSignal{
+			Name:             signal.Name,
+			DefaultValue:     defaultValue,
+			SignalDefinition: signal,
+		}
+		virtualSignals[signal.Name] = newSignal
+	}
+
+	return virtualSignals
+}
+
+// OverrideVirtualSignals overrides the provided signal map with override signals. This is typically use to overwrite
+// the data provided by the raw dbc signals with the signals defined by the virtual ecu
+func OverrideVirtualSignals(signals ecu_model.SignalMap, overrideSignals []ecu_model.VirtualSignal) ecu_model.SignalMap {
+	for _, overrideSignal := range overrideSignals {
+		virtualSignal, hasSignal := signals[overrideSignal.Name]
+		if hasSignal {
+			overrideSignal.SignalDefinition = virtualSignal.SignalDefinition
+			signals[overrideSignal.Name] = overrideSignal
+		}
+	}
+	return signals
 }

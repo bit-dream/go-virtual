@@ -57,7 +57,7 @@ func TestCreatePayload(t *testing.T) {
 
 	arr := make([]ecu_model.VirtualSignal, 0)
 	arr = append(arr, signal1, signal2)
-	payload := can_database.GeneratePayloadFromSignals(arr)
+	payload := can_database.MarshalSignalsToPayload(arr)
 	fmt.Println(payload)
 	if payload[0] != 10 {
 		t.Error("expected data byte 0 to be 10")

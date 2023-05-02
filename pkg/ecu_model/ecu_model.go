@@ -65,3 +65,5 @@ type TransmissionOptions struct {
 
 // ChannelMap maps the interface channel to a virtual message via dictionary
 type ChannelMap map[string][]VirtualMessage
+
+type SignalMap map[string]VirtualSignal
